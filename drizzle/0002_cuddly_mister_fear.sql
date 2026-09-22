@@ -1,0 +1,1 @@
+ALTER TABLE `tasks` MODIFY COLUMN `priority` enum('very low','low','medium','high') NOT NULL DEFAULT 'medium';

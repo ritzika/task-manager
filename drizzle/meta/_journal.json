@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1788010323357,
+      "tag": "0000_neat_the_twelve",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1788641845074,
+      "tag": "0001_milky_hercules",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1788720469359,
+      "tag": "0002_cuddly_mister_fear",
+      "breakpoints": true
+    }
+  ]
+}

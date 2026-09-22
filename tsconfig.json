@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    // Compile to JavaScript that Node can run.
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+
+    // Read .ts files from src/, write .js files to dist/.
+    "rootDir": "src",
+    "outDir": "dist",
+
+    // Catches common mistakes, like using a value that might be undefined.
+    "strict": true,
+
+    // Lets you write `import express from 'express'` instead of `import * as express`.
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"]
+}
