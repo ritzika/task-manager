@@ -19,7 +19,15 @@ export const createTaskSchema = taskFields.meta({ id: 'CreateTask' });
 
 // For updating, every field is optional — you might only change the title.
 export const updateTaskSchema = taskFields.partial().meta({ id: 'UpdateTask' });
-export const listTasksQuerySchema = z.object({status: z.enum(TASK_STATUSES).optional(), priority: z.enum(TASK_PRIORITIES).optional()});
+export const listTasksQuerySchema = z.object({
+  status: z.enum(TASK_STATUSES).optional(),
+  priority: z.enum(TASK_PRIORITIES).optional(),
+
+  // Everything in a URL is text, so "2" must become the number 2.
+  // z.coerce.number() does that conversion for us.
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+});
 
 // What a task looks like when we send it back. Note that the dates are text
 // here, because JSON has no date type — that's what the client actually receives.

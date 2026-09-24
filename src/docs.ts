@@ -56,7 +56,18 @@ export const openApiDocument = createDocument({
         summary: 'List all tasks',
         requestParams: { query: listTasksQuerySchema },
         responses: {
-          200: { description: 'Every task', content: json(z.array(taskSchema)) },
+          200: {
+            description: 'One page of tasks',
+            content: json(
+              z.object({
+                data: z.array(taskSchema),
+                page: z.number(),
+                limit: z.number(),
+                total: z.number(),
+                totalPages: z.number(),
+              }),
+            ),
+          },
           400: { description: 'The body was invalid', content: json(validationErrorSchema) },
 
         },

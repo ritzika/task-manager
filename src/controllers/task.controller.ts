@@ -19,10 +19,15 @@ function readIdParam(req: Request, res: Response): number | undefined {
 
 // GET /tasks
 export async function getTasks(req: Request, res: Response) {
-  // If ?status= is present but not a real status, .parse() throws → 400.
+  // If ?status=, ?page= etc. are present but invalid, .parse() throws → 400.
   const queryData = listTasksQuerySchema.parse(req.query);
-  const tasks = await taskService.getAllTasks(queryData.status, queryData.priority);
-  res.json(tasks);
+  const result = await taskService.getAllTasks(
+    queryData.status,
+    queryData.priority,
+    queryData.page,
+    queryData.limit,
+  );
+  res.json(result);
 }
 
 // GET /tasks/:id

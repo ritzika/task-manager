@@ -1,24 +1,54 @@
 // The service layer talks to the database. It knows nothing about HTTP.
-import { and, eq } from 'drizzle-orm';
+import { and, count, eq, SQL } from 'drizzle-orm';
 import { db } from '../db';
 import { Task, tasks } from '../db/schema';
 import { CreateTaskInput, UpdateTaskInput } from '../schemas/task.schema';
 
-export async function getAllTasks(status?: Task['status'], priority?: Task['priority']): Promise<Task[]> {
-    // SELECT * FROM tasks WHERE status = ?  (the WHERE only if a filter was given)  
-  if (status) {
-    if (priority){
-      return db.select().from(tasks).where(and(eq(tasks.status, status), eq(tasks.priority, priority)));
-    }else{
-      return db.select().from(tasks).where(eq(tasks.status, status));
-    }
-  }else{
-    if(priority){
-      return db.select().from(tasks).where(eq(tasks.priority, priority));
-    }else{
-      return db.select().from(tasks);
-    }
-  } 
+export async function getAllTasks(
+  status: Task['status'] | undefined,
+  priority: Task['priority'] | undefined,
+  page: number,
+  limit: number,
+) {
+  // 1. Work out the WHERE part. If no filter was given it stays undefined,
+  //    which means "no WHERE at all".
+  let whereCondition: SQL | undefined = undefined;
+
+  if (status && priority) {
+    whereCondition = and(eq(tasks.status, status), eq(tasks.priority, priority));
+  } else if (status) {
+    whereCondition = eq(tasks.status, status);
+  } else if (priority) {
+    whereCondition = eq(tasks.priority, priority);
+  }
+
+  // 2. How many rows to skip. Page 1 skips 0, page 2 skips `limit`, and so on.
+  const offset = (page - 1) * limit;
+
+  // 3. Get just this page of tasks.
+  // SELECT * FROM tasks WHERE ... ORDER BY id LIMIT ? OFFSET ?
+  // The ORDER BY keeps the order fixed, so a task never shows up on two pages.
+  const rows = await db
+    .select()
+    .from(tasks)
+    .where(whereCondition)
+    .orderBy(tasks.id)
+    .limit(limit)
+    .offset(offset);
+
+  // 4. Count ALL matching tasks, not just this page.
+  // SELECT COUNT(*) FROM tasks WHERE ...
+  const countResult = await db.select({ total: count() }).from(tasks).where(whereCondition);
+  const total = countResult[0].total;
+
+  // 5. Send back the tasks plus info about the pages.
+  return {
+    data: rows,
+    page: page,
+    limit: limit,
+    total: total,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 export async function getTaskById(id: number): Promise<Task | undefined> {
