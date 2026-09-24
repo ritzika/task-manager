@@ -1,16 +1,25 @@
 // The service layer talks to the database. It knows nothing about HTTP.
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from '../db';
 import { Task, tasks } from '../db/schema';
 import { CreateTaskInput, UpdateTaskInput } from '../schemas/task.schema';
 
-export async function getAllTasks(status?: Task['status']): Promise<Task[]> {
+export async function getAllTasks(status?: Task['status'], priority?: Task['priority']): Promise<Task[]> {
     // SELECT * FROM tasks WHERE status = ?  (the WHERE only if a filter was given)  
   if (status) {
+    if (priority){
+      return db.select().from(tasks).where(and(eq(tasks.status, status), eq(tasks.priority, priority)));
+    }else{
       return db.select().from(tasks).where(eq(tasks.status, status));
     }
-    return db.select().from(tasks);
-  }
+  }else{
+    if(priority){
+      return db.select().from(tasks).where(eq(tasks.priority, priority));
+    }else{
+      return db.select().from(tasks);
+    }
+  } 
+}
 
 export async function getTaskById(id: number): Promise<Task | undefined> {
   // SELECT * FROM tasks WHERE id = ?

@@ -3,7 +3,7 @@
 // These schemas do two jobs:
 //   1. Zod checks incoming JSON against them and throws if it's wrong.
 //   2. The API docs are generated from them, so the docs always match the rules.
-import { z } from 'zod';
+import { string, z } from 'zod';
 import { TASK_PRIORITIES, TASK_STATUSES } from '../db/schema';
 
 // The fields someone can send us. `.meta({ id })` gives the schema a name,
@@ -19,7 +19,7 @@ export const createTaskSchema = taskFields.meta({ id: 'CreateTask' });
 
 // For updating, every field is optional — you might only change the title.
 export const updateTaskSchema = taskFields.partial().meta({ id: 'UpdateTask' });
-export const listTasksQuerySchema = z.object({status: z.enum(TASK_STATUSES).optional(),});
+export const listTasksQuerySchema = z.object({status: z.enum(TASK_STATUSES).optional(), priority: z.enum(TASK_PRIORITIES).optional()});
 
 // What a task looks like when we send it back. Note that the dates are text
 // here, because JSON has no date type — that's what the client actually receives.

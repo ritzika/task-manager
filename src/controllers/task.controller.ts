@@ -19,11 +19,11 @@ function readIdParam(req: Request, res: Response): number | undefined {
 
 // GET /tasks
 export async function getTasks(req: Request, res: Response) {
-    // If ?status= is present but not a real status, .parse() throws → 400.
-    const { status } = listTasksQuerySchema.parse(req.query);
-    const tasks = await taskService.getAllTasks(status);
-    res.json(tasks);
-  }
+  // If ?status= is present but not a real status, .parse() throws → 400.
+  const queryData = listTasksQuerySchema.parse(req.query);
+  const tasks = await taskService.getAllTasks(queryData.status, queryData.priority);
+  res.json(tasks);
+}
 
 // GET /tasks/:id
 export async function getTask(req: Request, res: Response) {
